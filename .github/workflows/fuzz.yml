@@ -1,0 +1,36 @@
+name: shark7_7 Fuzzing Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  fuzzing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y afl++ build-essential python3
+
+      - name: Setup AFL++ environment
+        run: |
+          sudo bash -c 'echo core > /proc/sys/kernel/core_pattern'
+          mkdir -p outputs inputs
+          echo "shark7_7: ambiente de fuzzing configurado com sucesso"
+
+      - name: Execute Fuzzing (shark7_7)
+        run: |
+          echo "shark7_7: Iniciando fuzzing do mongotools..."
+          python3 generate_fuzz.py || true
+
+      - name: Upload Fuzzing Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: shark7_7-fuzz-results
+          path: outputs/
